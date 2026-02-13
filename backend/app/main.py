@@ -118,8 +118,25 @@ async def general_exception_handler(request, exc):
 # Serve static frontend files
 frontend_dist = Path(__file__).parent.parent.parent / "frontend" / "dist"
 if frontend_dist.exists():
-    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")
-    logger.info(f"Serving frontend from {frontend_dist}")
+    # Mount static assets (CSS, JS, images)
+    app.mount("/assets", StaticFiles(directory=frontend_dist / "assets"), name="assets")
+    
+    # Serve index.html for SPA routing
+    from fastapi.responses import FileResponse
+    
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        """Serve SPA - return index.html for all non-API routes"""
+        # Don't serve SPA for API routes
+        if full_path.startswith("api/"):
+            return {"error": "Not Found"}, 404
+        
+        index_file = frontend_dist / "index.html"
+        if index_file.exists():
+            return FileResponse(index_file)
+        return {"error": "Frontend not found"}, 404
+    
+    logger.info(f"Serving frontend SPA from {frontend_dist}")
 else:
     logger.warning(f"Frontend dist directory not found at {frontend_dist}")
 
