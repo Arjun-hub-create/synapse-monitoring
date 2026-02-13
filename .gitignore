@@ -109,3 +109,5 @@ poetry.lock
 .env.example.local
 app.config.ts
 next.config.js
+.vercel
+.env*.local
