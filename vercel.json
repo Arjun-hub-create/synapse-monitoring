@@ -1,4 +1,5 @@
 {
+  "name": "synapse-monitoring",
   "buildCommand": "cd frontend && npm install && npm run build",
   "devCommand": "npm run dev",
   "installCommand": "pip install -r requirements.txt && cd frontend && npm install",
