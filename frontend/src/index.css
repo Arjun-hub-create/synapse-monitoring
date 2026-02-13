@@ -1,0 +1,152 @@
+/**
+ * Global Styles
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-dark-bg text-dark-text font-sans antialiased;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-dark-bg;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-neon-cyan/30 hover:bg-neon-cyan/50 rounded-full;
+}
+
+/* Selection */
+::selection {
+  @apply bg-neon-cyan/20 text-neon-cyan;
+}
+
+/* Input focus effects */
+input:focus {
+  @apply text-neon-cyan;
+}
+
+/* Animation classes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.5s ease-out;
+}
+
+.animate-slideDown {
+  animation: slideDown 0.5s ease-out;
+}
+
+/* Utility classes */
+.glass {
+  @apply bg-dark-card/50 backdrop-blur-md border border-neon-cyan/10;
+}
+
+.glow-sm {
+  @apply shadow-neon-cyan;
+}
+
+.glow-md {
+  @apply shadow-lg shadow-neon-cyan/50;
+}
+
+.glow-lg {
+  @apply shadow-2xl shadow-neon-cyan/50;
+}
+
+.neon-text {
+  @apply text-neon-cyan font-bold animate-glow;
+}
+
+.dark-input {
+  @apply bg-dark-bg border border-neon-cyan/30 rounded px-4 py-2 text-dark-text placeholder-gray-500 focus:outline-none focus:border-neon-cyan focus:shadow-neon-cyan;
+}
+
+.card-hover {
+  @apply transition-all hover:border-neon-cyan/50 hover:shadow-neon-cyan/20 cursor-pointer;
+}
+
+/* Recharts customization */
+.recharts-surface {
+  filter: drop-shadow(0 0 5px rgba(0, 217, 255, 0.1));
+}
+
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: rgba(42, 47, 74, 0.5);
+}
+
+.recharts-text {
+  fill: rgba(160, 160, 255, 0.8);
+}
+
+.recharts-tooltip-wrapper {
+  outline: none;
+}
+
+.recharts-tooltip {
+  border-radius: 8px;
+  outline: none;
+}
+
+.recharts-tooltip-label {
+  color: rgba(224, 224, 255, 1);
+}
+
+.recharts-tooltip-item {
+  color: rgba(0, 217, 255, 1);
+}
+
+.recharts-default-tooltip {
+  outline: none;
+}
