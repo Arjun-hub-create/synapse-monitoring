@@ -1,5 +1,5 @@
 {
-  "name": "synapse-frontend",
+  "name": "synapse_frontend",
   "version": "1.0.0",
   "description": "Real-time system monitoring dashboard",
   "private": true,
