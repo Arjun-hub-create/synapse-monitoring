@@ -2,7 +2,7 @@
  * Auth Store (Zustand)
  */
 import { create } from 'zustand';
-import { AuthState, User } from '@/types';
+import { AuthState } from '@/types';
 import { authAPI, setAuthToken, clearAuthToken, initializeApiClient } from '@/utils/api';
 import { storage } from '@/utils';
 

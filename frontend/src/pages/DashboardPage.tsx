@@ -232,8 +232,8 @@ export const DashboardPage = () => {
           <div style={{ display: 'grid', gap: '1rem' }}>
             {metrics.map((service) => (
               <div
-                key={service.id}
-                onClick={() => setSelectedService(selectedService?.id === service.id ? null : service)}
+                key={service.service_id}
+                onClick={() => setSelectedService(selectedService?.service_id === service.service_id ? null : service)}
                 style={{
                   backgroundColor: '#0a0e27',
                   border: '1px solid #00d9ff',
@@ -279,7 +279,7 @@ export const DashboardPage = () => {
                 </div>
 
                 {/* Expanded View */}
-                {selectedService?.id === service.id && (
+                {selectedService?.service_id === service.service_id && (
                   <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #00d9ff33', backgroundColor: '#1a1f3a', padding: '1rem', borderRadius: '4px' }}>
                     <h4 style={{ color: '#00d9ff', marginTop: 0 }}>Response Times (Recent)</h4>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.75rem', fontSize: '0.85rem' }}>

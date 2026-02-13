@@ -8,7 +8,7 @@ import { getApiClient } from '@/utils/api';
 export const ResetPasswordPage = () => {
   const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
-  const [resetToken, setResetToken] = useState(searchParams.get('token') || '');
+  const [resetToken] = useState(searchParams.get('token') || '');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
