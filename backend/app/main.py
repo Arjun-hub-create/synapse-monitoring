@@ -2,6 +2,7 @@
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 import logging
 import os
@@ -122,8 +123,6 @@ if frontend_dist.exists():
     app.mount("/assets", StaticFiles(directory=frontend_dist / "assets"), name="assets")
     
     # Serve index.html for SPA routing
-    from fastapi.responses import FileResponse
-    
     @app.get("/{full_path:path}")
     async def serve_spa(full_path: str):
         """Serve SPA - return index.html for all non-API routes"""
