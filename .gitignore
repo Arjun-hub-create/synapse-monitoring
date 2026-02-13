@@ -6,7 +6,7 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
+/dist/
 downloads/
 eggs/
 .eggs/
@@ -46,8 +46,8 @@ yarn-debug.log*
 yarn-error.log*
 .npm/
 .eslintcache
-dist/
 build/
+# Note: frontend/dist/ is NOT ignored - it's needed for production builds
 
 # Environment variables
 .env
