@@ -90,20 +90,8 @@ app.include_router(alerts.router, prefix=settings.API_PREFIX)
 app.include_router(websocket.router)
 
 
-# Root endpoint
-@app.get("/")
-async def root():
-    """Root endpoint - API info"""
-    return {
-        "name": settings.APP_NAME,
-        "version": settings.APP_VERSION,
-        "docs": f"{settings.API_PREFIX}/docs",
-        "redoc": f"{settings.API_PREFIX}/redoc",
-    }
-
-
-# Health check endpoint
-@app.get("/health")
+# Health check endpoint (for monitoring)
+@app.get("/health", include_in_schema=False)
 async def health_check():
     """Simple health check"""
     return {"status": "ok", "service": settings.APP_NAME}
@@ -133,22 +121,22 @@ if frontend_dist.exists():
     async def spa_fallback(full_path: str):
         """Serve SPA index.html for client-side routing"""
         # Skip for known non-SPA paths
-        if any([
-            full_path.startswith("api/"),
-            full_path.startswith("docs"),
-            full_path.startswith("redoc"),
-            full_path.startswith("openapi"),
-            full_path == "health",
-            "." in full_path.split("/")[-1],  # Has file extension
-        ]):
+        skip_paths = ["api/", "docs", "redoc", "openapi", "health"]
+        
+        if any(full_path.startswith(path) for path in skip_paths):
             # Let other handlers process these
+            raise HTTPException(status_code=404, detail="Not found")
+        
+        # Skip files with extensions (static assets not in /assets)
+        if "." in full_path.split("/")[-1] and not full_path.startswith("assets/"):
             raise HTTPException(status_code=404, detail="Not found")
         
         index_file = frontend_dist / "index.html"
         if index_file.exists():
+            logger.info(f"Serving index.html for SPA route: /{full_path}")
             return FileResponse(index_file, media_type="text/html")
         
-        logger.warning(f"index.html not found at {index_file}")
+        logger.error(f"index.html not found at {index_file}")
         raise HTTPException(status_code=404, detail="SPA index not found")
 else:
     logger.error(f"Frontend dist not found at {frontend_dist}")
