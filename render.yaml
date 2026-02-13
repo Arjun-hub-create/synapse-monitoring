@@ -2,7 +2,7 @@ services:
   - type: web
     name: synapse-monitoring
     env: python
-    pythonVersion: 3.11
+    pythonVersion: 3.11.10
     buildCommand: bash build.sh
     startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
