@@ -16,11 +16,21 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "[2/3] Building frontend..."
+# Set API URL to relative path for same-origin requests
+export VITE_API_URL=/api/v1
 npm run build
 if [ $? -ne 0 ]; then
   echo "Frontend build failed"
   exit 1
 fi
+
+# Verify dist is created
+if [ ! -d "dist" ]; then
+  echo "ERROR: dist directory not created"
+  exit 1
+fi
+
+echo "Frontend dist created with $(find dist -type f | wc -l) files"
 
 cd ..
 

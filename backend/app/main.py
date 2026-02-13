@@ -116,28 +116,50 @@ async def general_exception_handler(request, exc):
     return await global_exception_handler(request, exc)
 
 
-# Serve static frontend files
+# Serve static frontend files with SPA fallback
 frontend_dist = Path(__file__).parent.parent.parent / "frontend" / "dist"
+
 if frontend_dist.exists():
-    # Mount static assets (CSS, JS, images)
-    app.mount("/assets", StaticFiles(directory=frontend_dist / "assets"), name="assets")
+    logger.info(f"Frontend dist found at {frontend_dist}")
     
-    # Serve index.html for SPA routing
-    @app.get("/{full_path:path}")
-    async def serve_spa(full_path: str):
-        """Serve SPA - return index.html for all non-API routes"""
-        # Don't serve SPA for API routes
-        if full_path.startswith("api/"):
-            return {"error": "Not Found"}, 404
+    # Try to mount assets folder if it exists
+    assets_dir = frontend_dist / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+        logger.info("Assets mounted successfully")
+    
+    # SPA fallback for all non-API, non-docs routes
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def spa_fallback(full_path: str):
+        """Serve SPA index.html for client-side routing"""
+        # Skip for known non-SPA paths
+        if any([
+            full_path.startswith("api/"),
+            full_path.startswith("docs"),
+            full_path.startswith("redoc"),
+            full_path.startswith("openapi"),
+            full_path == "health",
+            "." in full_path.split("/")[-1],  # Has file extension
+        ]):
+            # Let other handlers process these
+            raise HTTPException(status_code=404, detail="Not found")
         
         index_file = frontend_dist / "index.html"
         if index_file.exists():
-            return FileResponse(index_file)
-        return {"error": "Frontend not found"}, 404
-    
-    logger.info(f"Serving frontend SPA from {frontend_dist}")
+            return FileResponse(index_file, media_type="text/html")
+        
+        logger.warning(f"index.html not found at {index_file}")
+        raise HTTPException(status_code=404, detail="SPA index not found")
 else:
-    logger.warning(f"Frontend dist directory not found at {frontend_dist}")
+    logger.error(f"Frontend dist not found at {frontend_dist}")
+    
+    @app.get("/", include_in_schema=False)
+    async def frontend_not_found():
+        return {
+            "error": "Frontend not available",
+            "info": "Build and serve the frontend dist folder",
+            "api_docs": "/api/v1/docs"
+        }
 
 
 if __name__ == "__main__":
