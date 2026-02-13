@@ -1,8 +1,11 @@
 """Main FastAPI Application"""
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import logging
+import os
+from pathlib import Path
 
 from app.config import settings
 from app.database import connect_to_mongo, close_mongo_connection, init_indexes
@@ -110,6 +113,15 @@ async def health_check():
 async def general_exception_handler(request, exc):
     """Global exception handler"""
     return await global_exception_handler(request, exc)
+
+
+# Serve static frontend files
+frontend_dist = Path(__file__).parent.parent.parent / "frontend" / "dist"
+if frontend_dist.exists():
+    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")
+    logger.info(f"Serving frontend from {frontend_dist}")
+else:
+    logger.warning(f"Frontend dist directory not found at {frontend_dist}")
 
 
 if __name__ == "__main__":
