@@ -4,7 +4,6 @@ from typing import Optional, Dict
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from app.config import settings
-from app.models.user import User
 from bson import ObjectId
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
@@ -58,6 +57,7 @@ class AuthService:
         """Register new user (with demo mode fallback)"""
         try:
             from app.database import get_db
+            from app.models.user import User
             db = get_db()
             
             # Check if user exists
@@ -75,7 +75,9 @@ class AuthService:
             result = await db.users.insert_one(user.to_dict())
             return {"id": str(result.inserted_id), "email": email, "full_name": full_name}
         
-        except (RuntimeError, Exception):
+        except ValueError:
+            raise
+        except (RuntimeError, Exception) as e:
             # Demo mode: use in-memory storage
             if email in DEMO_USERS_DB:
                 raise ValueError("User with this email already exists")

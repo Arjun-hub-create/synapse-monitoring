@@ -1,8 +1,10 @@
 """Authentication Endpoints"""
 from fastapi import APIRouter, HTTPException, Depends, status
+import logging
 from app.schemas.user import UserRegister, UserLogin, UserResponse, TokenResponse, ForgotPasswordRequest, ResetPasswordRequest
 from app.services.auth_service import AuthService
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
@@ -17,26 +19,34 @@ async def register(user_data: UserRegister):
         )
         return {"message": "User registered successfully", "data": result}
     except ValueError as e:
+        logger.warning(f"Registration validation error: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Registration failed")
+        logger.error(f"Registration error: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Registration error: {str(e)}")
 
 
 @router.post("/login", response_model=TokenResponse)
 async def login(credentials: UserLogin):
     """Login user and get tokens"""
-    result = await AuthService.authenticate_user(
-        email=credentials.email, password=credentials.password
-    )
-    
-    if not result:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    
-    return TokenResponse(
-        access_token=result["access_token"],
-        refresh_token=result["refresh_token"],
-        token_type="bearer",
-    )
+    try:
+        result = await AuthService.authenticate_user(
+            email=credentials.email, password=credentials.password
+        )
+        
+        if not result:
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+        
+        return TokenResponse(
+            access_token=result["access_token"],
+            refresh_token=result["refresh_token"],
+            token_type="bearer",
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Login error: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Login error: {str(e)}")
 
 
 @router.get("/me", response_model=UserResponse)
