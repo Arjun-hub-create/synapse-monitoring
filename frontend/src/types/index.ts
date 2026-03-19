@@ -16,6 +16,9 @@ export interface Service {
   health_check_url: string;
   description: string;
   is_active: boolean;
+  headers?: Record<string, string>;
+  tags?: string[];
+  email_alerts_enabled?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -40,6 +43,7 @@ export interface HealthCheck {
 export interface ServiceMetrics {
   service_id: string;
   service_name: string;
+  tags?: string[];
   current_status: 'healthy' | 'unhealthy' | 'degraded' | 'unknown';
   uptime_percentage: number;
   avg_response_time_ms: number;

@@ -25,6 +25,13 @@ class Settings(BaseSettings):
     # Health Check
     HEALTH_CHECK_INTERVAL_SECONDS: int = 60
 
+    # Email Alerts
+    SMTP_HOST: Optional[str] = None
+    SMTP_PORT: int = 587
+    SMTP_USER: Optional[str] = None
+    SMTP_PASSWORD: Optional[str] = None
+    EMAILS_FROM_EMAIL: Optional[str] = "alerts@synapses.local"
+
     # Server
     HOST: str = "0.0.0.0"
     PORT: int = 8000

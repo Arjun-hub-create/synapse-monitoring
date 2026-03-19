@@ -1,10 +1,22 @@
 /**
- * API utility functions
+ * API utility functions - Fixed
  */
 import axios, { AxiosInstance } from 'axios';
 import { AuthToken, Service, ServiceDetail, HealthCheck, Alert, ServiceMetrics } from '@/types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
+// ── Base URL — works locally and on Render ──────────────────────
+const getBaseUrl = (): string => {
+  try {
+    const envUrl = import.meta.env.VITE_API_BASE_URL;
+    if (envUrl && typeof envUrl === 'string' && envUrl.length > 0) {
+      return envUrl;
+    }
+  } catch (_) { }
+  // Fallback — same server (works when frontend+backend on same domain)
+  return '/api/v1';
+};
+
+export const API_BASE_URL = getBaseUrl();
 
 let apiClient: AxiosInstance | null = null;
 
@@ -13,10 +25,9 @@ export const initializeApiClient = (accessToken?: string) => {
     baseURL: API_BASE_URL,
     headers: {
       'Content-Type': 'application/json',
-      ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
+      ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
     },
   });
-
   return apiClient;
 };
 
@@ -55,15 +66,17 @@ export const authAPI = {
 
 // Services API
 export const servicesAPI = {
-  create: (name: string, healthCheckUrl: string, description?: string) =>
+  create: (name: string, healthCheckUrl: string, description?: string, headers?: Record<string, string>, tags?: string[], emailAlertsEnabled?: boolean) =>
     getApiClient().post<Service>('/services', {
       name,
       health_check_url: healthCheckUrl,
-      description,
+      description: description || '',
+      headers,
+      tags,
+      email_alerts_enabled: emailAlertsEnabled,
     }),
 
-  list: () =>
-    getApiClient().get<Service[]>('/services'),
+  list: () => getApiClient().get<Service[]>('/services'),
 
   get: (serviceId: string) =>
     getApiClient().get<ServiceDetail>(`/services/${serviceId}`),

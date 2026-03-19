@@ -48,6 +48,27 @@ class AlertService:
             str(result.inserted_id), service_id, alert_type, message
         )
         
+        # Send Email notification if enabled
+        service = await db.services.find_one({"_id": ObjectId(service_id)})
+        if service and service.get("email_alerts_enabled"):
+            user = await db.users.find_one({"_id": ObjectId(user_id)})
+            if user and user.get("email"):
+                from app.services.email_service import EmailService
+                service_name = service.get("name", "Unknown")
+                subject = f"[{severity.upper()}] Synapse Alert: {service_name}"
+                
+                content = (
+                    f"A new alert has been triggered for your service.\n\n"
+                    f"Service: {service_name}\n"
+                    f"Message: {message}\n"
+                    f"Time (UTC): {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+                    f"Please check your Synapse dashboard for more details."
+                )
+                
+                # We do not await this heavily or we risk blocking, but asyncio.create_task is safe
+                import asyncio
+                asyncio.create_task(EmailService.send_email(user["email"], subject, content))
+        
         return {"id": str(result.inserted_id), "message": "Alert created"}
 
     @staticmethod
@@ -124,7 +145,26 @@ class AlertService:
                 }
             },
         )
-        
+        if result.modified_count > 0:
+            # Send Recovery Email notification if enabled
+            service = await db.services.find_one({"_id": ObjectId(service_id)})
+            if service and service.get("email_alerts_enabled"):
+                user = await db.users.find_one({"_id": service["user_id"]})
+                if user and user.get("email"):
+                    from app.services.email_service import EmailService
+                    service_name = service.get("name", "Unknown")
+                    subject = f"[RECOVERED] Synapse Alert: {service_name}"
+                    
+                    content = (
+                        f"Good news! Your service has recovered.\n\n"
+                        f"Service: {service_name}\n"
+                        f"Time (UTC): {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+                        f"Please check your Synapse dashboard for more details."
+                    )
+                    
+                    import asyncio
+                    asyncio.create_task(EmailService.send_email(user["email"], subject, content))
+
         return {"resolved_count": result.modified_count}
 
     @staticmethod

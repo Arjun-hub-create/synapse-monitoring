@@ -1,6 +1,6 @@
 """Service Model"""
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from bson import ObjectId
 
 
@@ -14,6 +14,9 @@ class Service:
         health_check_url: str,
         description: str = "",
         is_active: bool = True,
+        headers: Optional[dict] = None,
+        tags: Optional[List[str]] = None,
+        email_alerts_enabled: bool = False,
         _id: Optional[ObjectId] = None,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
@@ -24,6 +27,9 @@ class Service:
         self.health_check_url = health_check_url
         self.description = description
         self.is_active = is_active
+        self.headers = headers
+        self.tags = tags or []
+        self.email_alerts_enabled = email_alerts_enabled
         self.created_at = created_at or datetime.utcnow()
         self.updated_at = updated_at or datetime.utcnow()
 
@@ -36,6 +42,9 @@ class Service:
             "health_check_url": self.health_check_url,
             "description": self.description,
             "is_active": self.is_active,
+            "headers": self.headers,
+            "tags": self.tags,
+            "email_alerts_enabled": self.email_alerts_enabled,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
         }

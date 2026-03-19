@@ -1,7 +1,7 @@
 """Health Check Schemas"""
 from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 
 class HealthCheckResponse(BaseModel):
@@ -34,6 +34,7 @@ class ServiceMetricsResponse(BaseModel):
 
     service_id: str
     service_name: str
+    tags: Optional[List[str]] = None
     current_status: str
     uptime_percentage: float
     avg_response_time_ms: float

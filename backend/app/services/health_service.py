@@ -91,6 +91,7 @@ class HealthCheckService:
             return {
                 "service_id": service_id,
                 "service_name": service["name"],
+                "tags": service.get("tags"),
                 "current_status": "unknown",
                 "uptime_percentage": 0,
                 "avg_response_time_ms": 0,
@@ -110,6 +111,7 @@ class HealthCheckService:
         return {
             "service_id": service_id,
             "service_name": service["name"],
+            "tags": service.get("tags"),
             "current_status": checks[0]["status"],
             "uptime_percentage": (healthy_checks / len(checks)) * 100 if checks else 0,
             "avg_response_time_ms": sum(response_times) / len(response_times) if response_times else 0,

@@ -38,10 +38,11 @@ async def perform_service_check(service: dict):
         service_id = str(service["_id"])
         health_check_url = service["health_check_url"]
         user_id = str(service["user_id"])
+        headers = service.get("headers")
         
         # Perform check
         check_data = await HealthCheckService.perform_health_check(
-            service_id, health_check_url
+            service_id, health_check_url, headers
         )
         
         # Record check
@@ -54,10 +55,10 @@ async def perform_service_check(service: dict):
             # Resolve existing alerts if service is back to healthy
             await AlertService.resolve_service_alerts(service_id)
         
-        print(f"  ✓ {service['name']}: {check_data['status']}")
+        print(f"  OK {service['name']}: {check_data['status']}")
         
     except Exception as e:
-        print(f"  ✗ Error checking {service.get('name', 'Unknown')}: {e}")
+        print(f"  ERROR checking {service.get('name', 'Unknown')}: {e}")
 
 
 def start_scheduler():
@@ -71,13 +72,13 @@ def start_scheduler():
             name="Periodic Health Checks",
         )
         scheduler.start()
-        print(f"✓ Scheduler started: Health checks every {settings.HEALTH_CHECK_INTERVAL_SECONDS}s")
+        print(f"Scheduler started: Health checks every {settings.HEALTH_CHECK_INTERVAL_SECONDS}s")
     except Exception as e:
-        print(f"✗ Failed to start scheduler: {e}")
+        print(f"Failed to start scheduler: {e}")
 
 
 def stop_scheduler():
     """Stop the background scheduler"""
     if scheduler.running:
         scheduler.shutdown()
-        print("✓ Scheduler stopped")
+        print("Scheduler stopped")

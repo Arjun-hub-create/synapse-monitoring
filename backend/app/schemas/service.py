@@ -1,15 +1,19 @@
 """Service Schemas"""
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 
 class ServiceCreate(BaseModel):
     """Service creation schema"""
 
     name: str
-    health_check_url: HttpUrl
+    # Allow any URL-like string in local/demo instead of strict HttpUrl
+    health_check_url: str
     description: Optional[str] = ""
+    headers: Optional[dict] = None
+    tags: Optional[List[str]] = None
+    email_alerts_enabled: Optional[bool] = False
 
     class Config:
         json_schema_extra = {
@@ -25,9 +29,12 @@ class ServiceUpdate(BaseModel):
     """Service update schema"""
 
     name: Optional[str] = None
-    health_check_url: Optional[HttpUrl] = None
+    health_check_url: Optional[str] = None
     description: Optional[str] = None
     is_active: Optional[bool] = None
+    headers: Optional[dict] = None
+    tags: Optional[List[str]] = None
+    email_alerts_enabled: Optional[bool] = None
 
 
 class ServiceResponse(BaseModel):
@@ -38,6 +45,9 @@ class ServiceResponse(BaseModel):
     health_check_url: str
     description: str
     is_active: bool
+    headers: Optional[dict] = None
+    tags: Optional[List[str]] = None
+    email_alerts_enabled: bool = False
     created_at: datetime
     updated_at: datetime
 
